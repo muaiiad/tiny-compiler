@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
+
 
 public enum Token_Class
 {
@@ -96,7 +98,21 @@ namespace Tiny_Compiler
 
                 if (CurrentChar >= 'A' && CurrentChar <= 'z') 
                 {
-                   
+                    j++;
+                    // Identifier or Reserved Word
+                    while (j < SourceCode.Length && 
+                           ((SourceCode[j] >= 'A' && SourceCode[j] <= 'Z') ||
+                            (SourceCode[j] >= 'a' && SourceCode[j] <= 'z') ||
+                            (SourceCode[j] >= '0' && SourceCode[j] <= '9')))
+                    {
+                        CurrentLexeme += SourceCode[j];
+                        j++;
+                    }
+
+                    i = j - 1;
+                    FindTokenClass(CurrentLexeme);
+
+
                 }
 
                 else if(CurrentChar >= '0' && CurrentChar <= '9')
@@ -118,10 +134,22 @@ namespace Tiny_Compiler
             Token Tok = new Token();
             Tok.lex = Lex;
             //Is it a reserved word?
-            
-
+            if (ReservedWords.ContainsKey(Lex))
+            {
+                TC = ReservedWords[Lex];
+                Tok.token_type = TC;
+                Tokens.Add(Tok);
+                return;
+            }
             //Is it an identifier?
-            
+            if (isIdentifier(Lex))
+            {
+                TC = Token_Class.T_Identifier;
+                Tok.token_type = TC;
+                Tokens.Add(Tok);
+                return;
+            }
+
 
             //Is it a Constant?
 
@@ -135,10 +163,13 @@ namespace Tiny_Compiler
         bool isIdentifier(string lex)
         {
 
-            bool isValid=true;
             // TODO: Check if the lex is an identifier or not.
+            if (Regex.IsMatch(lex, @"\b[ a-zA-Z ]([ a-zA-Z0-9])*\b"))
+            {
+                return true;
+            }
             
-            return isValid;
+            return false;
         }
         bool isConstant(string lex)
         {
