@@ -43,47 +43,42 @@ namespace Tiny_Compiler
 
         public Scanner()
         {
-            // TODO: Initialize the ReservedWords and Operators dictionaries
-
-            // JASON CODE
-            //ReservedWords.Add("IF", Token_Class.If);
-            //ReservedWords.Add("BEGIN", Token_Class.Begin);
-            //ReservedWords.Add("CALL", Token_Class.Call);
-            //ReservedWords.Add("DECLARE", Token_Class.Declare);
-            //ReservedWords.Add("END", Token_Class.End);
-            //ReservedWords.Add("DO", Token_Class.Do);
-            //ReservedWords.Add("ELSE", Token_Class.Else);
-            //ReservedWords.Add("ENDIF", Token_Class.EndIf);
-            //ReservedWords.Add("ENDUNTIL", Token_Class.EndUntil);
-            //ReservedWords.Add("ENDWHILE", Token_Class.EndWhile);
-            //ReservedWords.Add("INTEGER", Token_Class.Integer);
-            //ReservedWords.Add("PARAMETERS", Token_Class.Parameters);
-            //ReservedWords.Add("PROCEDURE", Token_Class.Procedure);
-            //ReservedWords.Add("PROGRAM", Token_Class.Program);
-            //ReservedWords.Add("READ", Token_Class.Read);
-            //ReservedWords.Add("REAL", Token_Class.Real);
-            //ReservedWords.Add("SET", Token_Class.Set);
-            //ReservedWords.Add("THEN", Token_Class.Then);
-            //ReservedWords.Add("UNTIL", Token_Class.Until);
-            //ReservedWords.Add("WHILE", Token_Class.While);
-            //ReservedWords.Add("WRITE", Token_Class.Write);
-
-            //Operators.Add(".", Token_Class.Dot);
-            //Operators.Add(";", Token_Class.Semicolon);
-            //Operators.Add(",", Token_Class.Comma);
-            //Operators.Add("(", Token_Class.LParanthesis);
-            //Operators.Add(")", Token_Class.RParanthesis);
-            //Operators.Add("=", Token_Class.EqualOp);
-            //Operators.Add("<", Token_Class.LessThanOp);
-            //Operators.Add(">", Token_Class.GreaterThanOp);
-            //Operators.Add("!", Token_Class.NotEqualOp);
-            //Operators.Add("+", Token_Class.PlusOp);
-            //Operators.Add("-", Token_Class.MinusOp);
-            //Operators.Add("*", Token_Class.MultiplyOp);
-            //Operators.Add("/", Token_Class.DivideOp);
+            ReservedWords.Add("int", Token_Class.T_Int);
+            ReservedWords.Add("float", Token_Class.T_Float);
+            ReservedWords.Add("string", Token_Class.T_String);
+            ReservedWords.Add("read", Token_Class.T_Read);
+            ReservedWords.Add("write", Token_Class.T_Write);
+            ReservedWords.Add("repeat", Token_Class.T_Repeat);  
+            ReservedWords.Add("until", Token_Class.T_Until);
+            ReservedWords.Add("if", Token_Class.T_If);
+            ReservedWords.Add("elseif", Token_Class.T_ElseIf);
+            ReservedWords.Add("else", Token_Class.T_Else);
+            ReservedWords.Add("then", Token_Class.T_Then);
+            ReservedWords.Add("return", Token_Class.T_Return);
+            ReservedWords.Add("endl", Token_Class.T_Endl);
+            ReservedWords.Add("end", Token_Class.T_End);
+            ReservedWords.Add("main", Token_Class.T_Main);
 
 
-
+            Operators.Add("+", Token_Class.T_PlusOp);
+            Operators.Add("-", Token_Class.T_MinusOp);
+            Operators.Add("*", Token_Class.T_MultiplyOp);
+            Operators.Add("/", Token_Class.T_DivideOp);
+            Operators.Add("<", Token_Class.T_LessThan);
+            Operators.Add(">", Token_Class.T_GreaterThan);
+            Operators.Add("=", Token_Class.T_Equal);
+            Operators.Add("!", Token_Class.T_NotEqual);
+            Operators.Add("&&", Token_Class.T_And);
+            Operators.Add("||", Token_Class.T_Or);
+            Operators.Add("(", Token_Class.T_LeftParenthesis);
+            Operators.Add(")", Token_Class.T_RightParentesis);
+            Operators.Add("{", Token_Class.T_LeftCurlyBracket);
+            Operators.Add("}", Token_Class.T_RightCurlyBracket);
+            Operators.Add(",", Token_Class.T_Comma);
+            Operators.Add(";", Token_Class.T_Semicolon);
+            Operators.Add(":=", Token_Class.T_Assign);
+            Operators.Add("==", Token_Class.T_Equal);
+            Operators.Add("!=", Token_Class.T_NotEqual);
         }
 
         public void StartScanning(string SourceCode)
