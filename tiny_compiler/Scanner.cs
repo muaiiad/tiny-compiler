@@ -119,9 +119,15 @@ namespace Tiny_Compiler
                 {
 
                 }
+                //brackets
+                else if(CurrentChar == '(' || CurrentChar == ')' || CurrentChar == '{' || CurrentChar == '}')
+                {
+                    CurrentLexeme = CurrentChar.ToString();
+                    FindTokenClass(CurrentLexeme);
+                }
                 else
                 {
-                   
+
                 }
             }
             
@@ -154,6 +160,13 @@ namespace Tiny_Compiler
             //Is it a Constant?
 
             //Is it an operator?
+            if (Operators.ContainsKey(Lex))
+            {
+                TC = Operators[Lex];
+                Tok.token_type = TC;
+                Tokens.Add(Tok);
+                return;
+            }
 
             //Is it an undefined?
         }
