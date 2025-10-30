@@ -125,6 +125,20 @@ namespace Tiny_Compiler
                     CurrentLexeme = CurrentChar.ToString();
                     FindTokenClass(CurrentLexeme);
                 }
+                else if (CurrentChar == '/')
+                {
+                    j++;
+                    if (j<SourceCode.Length && SourceCode[j] == '*')
+                    {
+                        j++;
+                        while (j < SourceCode.Length - 1 && !(SourceCode[j] == '*' && SourceCode[j + 1] == '/'))
+                        {
+                            j++;
+                        }
+                        j += 2;
+                        i = j - 1;
+                    }
+                }
                 else
                 {
 
