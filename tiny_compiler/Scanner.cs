@@ -181,27 +181,12 @@ namespace Tiny_Compiler
                 else if (CurrentChar == '<' || CurrentChar == '>' || CurrentChar == '=' || CurrentChar == '&' || CurrentChar == '|')
                 {
                     j++;
-                    if (j < SourceCode.Length)
+                    while (j < SourceCode.Length && !(SourceCode[j] == ' ' || SourceCode[j] == '\n' || SourceCode[j] == '\t'))
                     {
-                        if (CurrentChar == '<' && SourceCode[j] == '>')
-                        {
-                            CurrentLexeme += SourceCode[j];
-                            j++;
-                        }
-                        else if (CurrentChar == '&' && SourceCode[j] == '&')
-                        {
-                            CurrentLexeme += SourceCode[j];
-                            j++;
-                        }
-                        else if (CurrentChar == '|' && SourceCode[j] == '|')
-                        {
-                            CurrentLexeme += SourceCode[j];
-                            j++;
-                        }
-
+                        CurrentLexeme += SourceCode[j];
+                        j++;
                     }
                     i = j - 1;
-                    if(SourceCode[j]==' '||SourceCode[j]=='\n'||SourceCode[j]=='\t' )
                     FindTokenClass(CurrentLexeme);
                 }
                 else { }
