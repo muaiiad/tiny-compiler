@@ -82,7 +82,6 @@ namespace Tiny_Compiler
             Operators.Add(",", Token_Class.T_Comma);
             Operators.Add(";", Token_Class.T_Semicolon);
             Operators.Add(":=", Token_Class.T_Assign);
-            Operators.Add("==", Token_Class.T_Equal);
             Operators.Add("<>", Token_Class.T_NotEqual);
         }
 
