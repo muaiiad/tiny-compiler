@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -115,12 +115,29 @@ namespace Tiny_Compiler
 
                 }
 
-                else if(CurrentChar >= '0' && CurrentChar <= '9')
+                else if (CurrentChar >= '0' && CurrentChar <= '9')
                 {
-
+                    j++;
+                    bool deci= false;
+                    while (j < SourceCode.Length){
+                        char next = SourceCode[j];
+                        if (next >= '0' && next <= '9') {
+                            CurrentLexeme += next;
+                            j++;
+                        }
+                        else if ((!deci) && next == '.') {
+                            deci = true;
+                            CurrentLexeme += next;
+                            j++;
+                        }
+                        else break;
+                    }
+                    i = j - 1;
+                    FindTokenClass(CurrentLexeme);
                 }
+
                 //brackets
-                else if(CurrentChar == '(' || CurrentChar == ')' || CurrentChar == '{' || CurrentChar == '}')
+                else if (CurrentChar == '(' || CurrentChar == ')' || CurrentChar == '{' || CurrentChar == '}')
                 {
                     CurrentLexeme = CurrentChar.ToString();
                     FindTokenClass(CurrentLexeme);
@@ -169,9 +186,15 @@ namespace Tiny_Compiler
                 Tokens.Add(Tok);
                 return;
             }
-
-
             //Is it a Constant?
+            if (isConstant(Lex))
+            {
+                TC = Token_Class.T_Number;
+                Tok.token_type = TC;
+                Tokens.Add(Tok);
+                return;
+            }
+
 
             //Is it an operator?
             if (Operators.ContainsKey(Lex))
@@ -200,10 +223,9 @@ namespace Tiny_Compiler
         }
         bool isConstant(string lex)
         {
-            bool isValid = true;
             // TODO: Check if the lex is a constant (Number) or not.
-
-            return isValid;
+            string num=@"^([1-9][0-9]*(\.[0-9]+)?)|(0(\.[0-9]+)?)$";
+            return (Regex.IsMatch(lex, num));
         }
     }
 }
