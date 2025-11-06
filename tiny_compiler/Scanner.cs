@@ -123,38 +123,39 @@ namespace Tiny_Compiler
                     j++;
                     bool deci = false;
                     bool invalid = false;
-                    while (j < SourceCode.Length) { 
+                    while (j < SourceCode.Length)
+                    {
                         char next = SourceCode[j];
-                        if (next >= '0' && next <= '9') { 
-                                CurrentLexeme += next;
+                        if (next >= '0' && next <= '9')
+                        {
+                            CurrentLexeme += next;
+                            j++;
+                        }
+                        else if (!deci && next == '.')
+                        {
+                            deci = true;
+                            CurrentLexeme += next;
+                            j++;
+                        }
+                        else if ((next >= 'A' && next <= 'Z') || (next >= 'a' && next <= 'z') || next == '_')
+                        {
+                            invalid = true;
+                            CurrentLexeme += next;
+                            j++;
+                            while (j < SourceCode.Length && ((SourceCode[j] >= 'A' && SourceCode[j] <= 'Z') ||
+                                   (SourceCode[j] >= 'a' && SourceCode[j] <= 'z') || (SourceCode[j] >= '0' && SourceCode[j] <= '9') || SourceCode[j] == '_'))
+                            {
+                                CurrentLexeme += SourceCode[j];
                                 j++;
                             }
-                        else if (!deci && next == '.') {
-                                deci = true;
-                                CurrentLexeme += next;
-                                j++;
-                            }
-                            else if ((next >= 'A' && next <= 'Z') || (next >= 'a' && next <= 'z') || next == '_') {
-                                invalid = true;
-                                CurrentLexeme += next;
-                                j++;
-                                while (j < SourceCode.Length && ((SourceCode[j] >= 'A' && SourceCode[j] <= 'Z') ||
-                                       (SourceCode[j] >= 'a' && SourceCode[j] <= 'z') || (SourceCode[j] >= '0' && SourceCode[j] <= '9') || SourceCode[j] == '_')) {
-                                    CurrentLexeme += SourceCode[j];
-                                    j++;
-                                }
 
-                                break;
-                            }
-                            else break;
+                            break;
+                        }
+                        else break;
                     }
 
                     i = j - 1;
-                    if (invalid)
-                        Tokens.Add(new Token { lex = CurrentLexeme, token_type = Token_Class.T_Error });
-
-                    else
-                        FindTokenClass(CurrentLexeme);
+                    FindTokenClass(CurrentLexeme);
                 }
 
                 //brackets
@@ -215,8 +216,6 @@ namespace Tiny_Compiler
                 Tokens.Add(Tok);
                 return;
             }
-
-
             //Is it an operator?
             if (Operators.ContainsKey(Lex))
             {
@@ -227,6 +226,9 @@ namespace Tiny_Compiler
             }
 
             //Is it an undefined?
+
+            Tokens.Add(new Token { lex = Lex, token_type = Token_Class.T_Error });
+            return;
         }
 
     
