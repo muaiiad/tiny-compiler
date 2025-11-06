@@ -26,7 +26,10 @@ public enum Token_Class
     T_Int, T_Float, T_String, T_Read,
     T_Write, T_Repeat, T_Until, T_If,
     T_ElseIf, T_Else, T_Then, T_Return,
-    T_Endl, T_End, T_Main
+    T_Endl, T_End, T_Main,
+
+    //Error
+    T_Error
 
 }
 namespace Tiny_Compiler
@@ -118,22 +121,40 @@ namespace Tiny_Compiler
                 else if (CurrentChar >= '0' && CurrentChar <= '9')
                 {
                     j++;
-                    bool deci= false;
-                    while (j < SourceCode.Length){
+                    bool deci = false;
+                    bool invalid = false;
+                    while (j < SourceCode.Length) { 
                         char next = SourceCode[j];
-                        if (next >= '0' && next <= '9') {
-                            CurrentLexeme += next;
-                            j++;
-                        }
-                        else if ((!deci) && next == '.') {
-                            deci = true;
-                            CurrentLexeme += next;
-                            j++;
-                        }
-                        else break;
+                        if (next >= '0' && next <= '9') { 
+                                CurrentLexeme += next;
+                                j++;
+                            }
+                        else if (!deci && next == '.') {
+                                deci = true;
+                                CurrentLexeme += next;
+                                j++;
+                            }
+                            else if ((next >= 'A' && next <= 'Z') || (next >= 'a' && next <= 'z') || next == '_') {
+                                invalid = true;
+                                CurrentLexeme += next;
+                                j++;
+                                while (j < SourceCode.Length && ((SourceCode[j] >= 'A' && SourceCode[j] <= 'Z') ||
+                                       (SourceCode[j] >= 'a' && SourceCode[j] <= 'z') || (SourceCode[j] >= '0' && SourceCode[j] <= '9') || SourceCode[j] == '_')) {
+                                    CurrentLexeme += SourceCode[j];
+                                    j++;
+                                }
+
+                                break;
+                            }
+                            else break;
                     }
+
                     i = j - 1;
-                    FindTokenClass(CurrentLexeme);
+                    if (invalid)
+                        Tokens.Add(new Token { lex = CurrentLexeme, token_type = Token_Class.T_Error });
+
+                    else
+                        FindTokenClass(CurrentLexeme);
                 }
 
                 //brackets
@@ -224,7 +245,7 @@ namespace Tiny_Compiler
         bool isConstant(string lex)
         {
             // TODO: Check if the lex is a constant (Number) or not.
-            string num=@"^([1-9][0-9]*(\.[0-9]+)?)|(0(\.[0-9]+)?)$";
+            string num = @"^((([1-9][0-9]*(\.[0-9]+)?)|(0(\.[0-9]+)?)))(?![A-Za-z_])$";
             return (Regex.IsMatch(lex, num));
         }
     }
