@@ -201,6 +201,7 @@ namespace Tiny_Compiler
 
                     }
                     i = j - 1;
+                    if(SourceCode[j]==' '||SourceCode[j]=='\n'||SourceCode[j]=='\t' )
                     FindTokenClass(CurrentLexeme);
                 }
                 else { }
