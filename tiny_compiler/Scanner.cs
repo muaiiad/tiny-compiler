@@ -36,8 +36,8 @@ namespace Tiny_Compiler
 {
     public class Token
     {
-       public string lex;
-       public Token_Class token_type;
+        public string lex;
+        public Token_Class token_type;
     }
 
     public class Scanner
@@ -53,7 +53,7 @@ namespace Tiny_Compiler
             ReservedWords.Add("string", Token_Class.T_String);
             ReservedWords.Add("read", Token_Class.T_Read);
             ReservedWords.Add("write", Token_Class.T_Write);
-            ReservedWords.Add("repeat", Token_Class.T_Repeat);  
+            ReservedWords.Add("repeat", Token_Class.T_Repeat);
             ReservedWords.Add("until", Token_Class.T_Until);
             ReservedWords.Add("if", Token_Class.T_If);
             ReservedWords.Add("elseif", Token_Class.T_ElseIf);
@@ -88,7 +88,7 @@ namespace Tiny_Compiler
 
         public void StartScanning(string SourceCode)
         {
-            for(int i=0; i<SourceCode.Length;i++)
+            for (int i = 0; i < SourceCode.Length; i++)
             {
                 int j = i;
                 char CurrentChar = SourceCode[i];
@@ -99,11 +99,11 @@ namespace Tiny_Compiler
 
                 // TODO : Complete the scanning logic here
 
-                if (CurrentChar >= 'A' && CurrentChar <= 'z') 
+                if (CurrentChar >= 'A' && CurrentChar <= 'z')
                 {
                     j++;
                     // Identifier or Reserved Word
-                    while (j < SourceCode.Length && 
+                    while (j < SourceCode.Length &&
                            ((SourceCode[j] >= 'A' && SourceCode[j] <= 'Z') ||
                             (SourceCode[j] >= 'a' && SourceCode[j] <= 'z') ||
                             (SourceCode[j] >= '0' && SourceCode[j] <= '9')))
@@ -167,7 +167,7 @@ namespace Tiny_Compiler
                 else if (CurrentChar == '/')
                 {
                     j++;
-                    if (j<SourceCode.Length && SourceCode[j] == '*')
+                    if (j < SourceCode.Length && SourceCode[j] == '*')
                     {
                         j++;
                         while (j < SourceCode.Length - 1 && !(SourceCode[j] == '*' && SourceCode[j + 1] == '/'))
@@ -178,77 +178,100 @@ namespace Tiny_Compiler
                         i = j - 1;
                     }
                 }
-                else
+                //operators
+                else if (CurrentChar == '<' || CurrentChar == '>' || CurrentChar == '=' || CurrentChar == '&' || CurrentChar == '|')
                 {
+                    j++;
+                    if (j < SourceCode.Length)
+                    {
+                        if (CurrentChar == '<' && SourceCode[j] == '>')
+                        {
+                            CurrentLexeme += SourceCode[j];
+                            j++;
+                        }
+                        else if (CurrentChar == '&' && SourceCode[j] == '&')
+                        {
+                            CurrentLexeme += SourceCode[j];
+                            j++;
+                        }
+                        else if (CurrentChar == '|' && SourceCode[j] == '|')
+                        {
+                            CurrentLexeme += SourceCode[j];
+                            j++;
+                        }
 
+                    }
+                    i = j - 1;
+                    FindTokenClass(CurrentLexeme);
                 }
+                else { }
+
+                tiny_compiler.TokenStream = Tokens;
             }
-            
-            tiny_compiler.TokenStream = Tokens;
-        }
-        void FindTokenClass(string Lex)
-        {
-            // TODO: Determine the token class of the lexeme
-            Token_Class TC;
-            Token Tok = new Token();
-            Tok.lex = Lex;
-            //Is it a reserved word?
-            if (ReservedWords.ContainsKey(Lex))
+            void FindTokenClass(string Lex)
             {
-                TC = ReservedWords[Lex];
-                Tok.token_type = TC;
-                Tokens.Add(Tok);
+                // TODO: Determine the token class of the lexeme
+                Token_Class TC;
+                Token Tok = new Token();
+                Tok.lex = Lex;
+                //Is it a reserved word?
+                if (ReservedWords.ContainsKey(Lex))
+                {
+                    TC = ReservedWords[Lex];
+                    Tok.token_type = TC;
+                    Tokens.Add(Tok);
+                    return;
+                }
+                //Is it an identifier?
+                if (isIdentifier(Lex))
+                {
+                    TC = Token_Class.T_Identifier;
+                    Tok.token_type = TC;
+                    Tokens.Add(Tok);
+                    return;
+                }
+                //Is it a Constant?
+                if (isConstant(Lex))
+                {
+                    TC = Token_Class.T_Number;
+                    Tok.token_type = TC;
+                    Tokens.Add(Tok);
+                    return;
+                }
+                //Is it an operator?
+                if (Operators.ContainsKey(Lex))
+                {
+                    TC = Operators[Lex];
+                    Tok.token_type = TC;
+                    Tokens.Add(Tok);
+                    return;
+                }
+
+                //Is it an undefined?
+
+                Tokens.Add(new Token { lex = Lex, token_type = Token_Class.T_Error });
                 return;
             }
-            //Is it an identifier?
-            if (isIdentifier(Lex))
+
+
+
+            bool isIdentifier(string lex)
             {
-                TC = Token_Class.T_Identifier;
-                Tok.token_type = TC;
-                Tokens.Add(Tok);
-                return;
+
+                // TODO: Check if the lex is an identifier or not.
+                if (Regex.IsMatch(lex, @"\b[ a-zA-Z ]([ a-zA-Z0-9])*\b"))
+                {
+                    return true;
+                }
+
+                return false;
             }
-            //Is it a Constant?
-            if (isConstant(Lex))
+            bool isConstant(string lex)
             {
-                TC = Token_Class.T_Number;
-                Tok.token_type = TC;
-                Tokens.Add(Tok);
-                return;
+                // TODO: Check if the lex is a constant (Number) or not.
+                string num = @"^((([1-9][0-9]*(\.[0-9]+)?)|(0(\.[0-9]+)?)))(?![A-Za-z_])$";
+                return (Regex.IsMatch(lex, num));
             }
-            //Is it an operator?
-            if (Operators.ContainsKey(Lex))
-            {
-                TC = Operators[Lex];
-                Tok.token_type = TC;
-                Tokens.Add(Tok);
-                return;
-            }
-
-            //Is it an undefined?
-
-            Tokens.Add(new Token { lex = Lex, token_type = Token_Class.T_Error });
-            return;
-        }
-
-    
-
-        bool isIdentifier(string lex)
-        {
-
-            // TODO: Check if the lex is an identifier or not.
-            if (Regex.IsMatch(lex, @"\b[ a-zA-Z ]([ a-zA-Z0-9])*\b"))
-            {
-                return true;
-            }
-            
-            return false;
-        }
-        bool isConstant(string lex)
-        {
-            // TODO: Check if the lex is a constant (Number) or not.
-            string num = @"^((([1-9][0-9]*(\.[0-9]+)?)|(0(\.[0-9]+)?)))(?![A-Za-z_])$";
-            return (Regex.IsMatch(lex, num));
         }
     }
 }
