@@ -190,37 +190,41 @@ namespace Tiny_Compiler
                     FindTokenClass(CurrentLexeme);
                 }
                 //stringliteral
-               else if (CurrentChar == '"')
-                   {
+                else if (CurrentChar == '"')
+                {
                     j++;
-                    CurrentLexeme+=CurrentChar;
-                   bool valid = false;
-                   while (j < SourceCode.Length)
+                    bool valid = false;
+                    while (j < SourceCode.Length)
                     {
-                     if (SourceCode[j] == '\\') 
-                     {
-                     if (j + 1 < SourceCode.Length)
-                      {
-                        CurrentLexeme += SourceCode[j];
-                        CurrentLexeme += SourceCode[j + 1];
-                        j += 2;}
-                    else break;
-                      }
-                    else if (SourceCode[j] == '"') 
-                      {
-                    CurrentLexeme += '"';
-                    j++;
-                    valid = true;
-                    break; }
-                    else
-                      {
-                    CurrentLexeme += SourceCode[j];
-                    j++; }
+                        if (SourceCode[j] == '\\')
+                        {
+                            if (j + 1 < SourceCode.Length)
+                            {
+                                CurrentLexeme += SourceCode[j];
+                                CurrentLexeme += SourceCode[j + 1];
+                                j += 2;
+                            }
+                            else break;
+                        }
+                        else if (SourceCode[j] == '"')
+                        {
+                            CurrentLexeme += '"';
+                            j++;
+                            valid = true;
+                            break;
+                        }
+                        else
+                        {
+                            CurrentLexeme += SourceCode[j];
+                            j++;
+                        }
                     }
                     if (valid)
-                    {    i = j - 1;
-                    FindTokenClass(CurrentLexeme);
-                      }}
+                    {
+                        i = j - 1;
+                        FindTokenClass(CurrentLexeme);
+                    }
+                }
                 else { }
 
                 tiny_compiler.TokenStream = Tokens;
@@ -285,7 +289,7 @@ namespace Tiny_Compiler
             {
 
                 // TODO: Check if the lex is an identifier or not.
-                if (Regex.IsMatch(lex, @"\b[ a-zA-Z ]([ a-zA-Z0-9])*\b"))
+                if (Regex.IsMatch(lex, @"^[a-zA-Z]([a-zA-Z0-9])*$"))
                 {
                     return true;
                 }
