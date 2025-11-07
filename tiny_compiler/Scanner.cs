@@ -189,6 +189,38 @@ namespace Tiny_Compiler
                     i = j - 1;
                     FindTokenClass(CurrentLexeme);
                 }
+                //stringliteral
+               else if (CurrentChar == '"')
+                   {
+                    j++;
+                    CurrentLexeme+=CurrentChar;
+                   bool valid = false;
+                   while (j < SourceCode.Length)
+                    {
+                     if (SourceCode[j] == '\\') 
+                     {
+                     if (j + 1 < SourceCode.Length)
+                      {
+                        CurrentLexeme += SourceCode[j];
+                        CurrentLexeme += SourceCode[j + 1];
+                        j += 2;}
+                    else break;
+                      }
+                    else if (SourceCode[j] == '"') 
+                      {
+                    CurrentLexeme += '"';
+                    j++;
+                    valid = true;
+                    break; }
+                    else
+                      {
+                    CurrentLexeme += SourceCode[j];
+                    j++; }
+                    }
+                    if (valid)
+                    {    i = j - 1;
+                    FindTokenClass(CurrentLexeme);
+                      }}
                 else { }
 
                 tiny_compiler.TokenStream = Tokens;
@@ -211,6 +243,13 @@ namespace Tiny_Compiler
                 if (isIdentifier(Lex))
                 {
                     TC = Token_Class.T_Identifier;
+                    Tok.token_type = TC;
+                    Tokens.Add(Tok);
+                    return;
+                }
+                //Is it a stringliteral?
+                    if(isStringLiteral(Lex)){
+                    TC = Token_Class.T_StringLiteral;
                     Tok.token_type = TC;
                     Tokens.Add(Tok);
                     return;
@@ -238,7 +277,9 @@ namespace Tiny_Compiler
                 return;
             }
 
-
+            bool isStringLiteral(string lex){
+                return (Regex.IsMatch(lex,@"^""([^""\\]|\\.)*""$"));
+            }
 
             bool isIdentifier(string lex)
             {
