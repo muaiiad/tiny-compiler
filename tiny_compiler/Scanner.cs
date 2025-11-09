@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
+using Tiny_Compiler;
 
 
 public enum Token_Class
@@ -45,7 +46,6 @@ namespace Tiny_Compiler
         public List<Token> Tokens = new List<Token>();
         Dictionary<string, Token_Class> ReservedWords = new Dictionary<string, Token_Class>();
         Dictionary<string, Token_Class> Operators = new Dictionary<string, Token_Class>();
-
         public Scanner()
         {
             ReservedWords.Add("int", Token_Class.T_Int);
@@ -212,7 +212,6 @@ namespace Tiny_Compiler
                  else if (CurrentChar == '"')
                 {
                     j++;
-                    CurrentLexeme += CurrentChar;
                     bool valid = false;
                     while (j < SourceCode.Length)
                     {
@@ -231,7 +230,9 @@ namespace Tiny_Compiler
                     { i = j - 1;
                         FindTokenClass(CurrentLexeme);
                     } }
-                else { }
+                else {
+                    FindTokenClass(CurrentLexeme);
+                }
 
                 tiny_compiler.TokenStream = Tokens;
             }
@@ -283,7 +284,8 @@ namespace Tiny_Compiler
 
                 //Is it an undefined?
 
-                Tokens.Add(new Token { lex = Lex, token_type = Token_Class.T_Error });
+                Errors.Error_List.Add("Error: Undefined Lexeme -> " + Lex + "\n");
+
                 return;
             }
 
