@@ -69,6 +69,11 @@ namespace Tiny_Compiler
         {
 
         }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
         /*  void PrintLexemes()
 {
 for (int i = 0; i < JASON_Compiler.Lexemes.Count; i++)
