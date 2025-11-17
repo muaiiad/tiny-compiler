@@ -166,12 +166,19 @@ namespace Tiny_Compiler
                 else if (CurrentChar == '/' && (j+1) < SourceCode.Length && SourceCode[j+1] == '*')
                 {
                     j += 2;
+                    Errors.Error_List.Add($"Incomplete comment starting at {j-2}\n");
+                    CurrentLexeme = "";
                     while (j < SourceCode.Length - 1 && !(SourceCode[j] == '*' && SourceCode[j + 1] == '/'))
                     {
                         j++;
+                        if (SourceCode[j] == '*' && SourceCode[j + 1] == '/')
+                        {
+                            Errors.Error_List.RemoveAt(Errors.Error_List.Count - 1);
+                            j += 2;
+                            i = j - 1;
+                            break;
+                        }
                     }
-                    j += 2;
-                    i = j - 1;
                 }
                 //operators
                 else if (CurrentChar == '<' || CurrentChar == '>' || CurrentChar == '=' || CurrentChar == '&' || CurrentChar == '|')
@@ -186,20 +193,16 @@ namespace Tiny_Compiler
                     FindTokenClass(CurrentLexeme);
                 }
 
-                else if (CurrentChar == '+' || CurrentChar == '-' || CurrentChar == '*' || CurrentChar == '/')
-                {
-                    FindTokenClass(CurrentLexeme);
-                }
-
-                else if (CurrentChar == ':')
+                else if (CurrentChar == '+' || CurrentChar == '-' || CurrentChar == '*' || CurrentChar == '/' || CurrentChar == ':')
                 {
                     j++;
-                    if (SourceCode[j] == '=')
+                    while (j < SourceCode.Length && !(SourceCode[j] == ' ' || SourceCode[j] == '\n' || SourceCode[j] == '\t'))
                     {
                         CurrentLexeme += SourceCode[j];
-                        i = j;
-                        FindTokenClass(CurrentLexeme);
+                        j++;
                     }
+                    i = j - 1;
+                    FindTokenClass(CurrentLexeme);
                 }
 
                 //separators 
@@ -284,7 +287,7 @@ namespace Tiny_Compiler
 
                 //Is it an undefined?
 
-                Errors.Error_List.Add("Error: Undefined Lexeme -> " + Lex + "\n");
+                Errors.Error_List.Add("Error: Undefined Token -> " + Lex + "\n");
 
                 return;
             }
