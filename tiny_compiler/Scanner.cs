@@ -216,6 +216,7 @@ namespace Tiny_Compiler
                 {
                     j++;
                     bool valid = false;
+                    Errors.Error_List.Add($"Error: Unterminated String Literal starting at {i}\n");
                     while (j < SourceCode.Length)
                     {
                         if (SourceCode[j] == '"')
@@ -223,6 +224,7 @@ namespace Tiny_Compiler
                             CurrentLexeme += '"';
                             j++;
                             valid = true;
+                            Errors.Error_List.RemoveAt(Errors.Error_List.Count - 1);
                             break; }
                         else
                         {
