@@ -18,7 +18,7 @@ public enum Token_Class
     T_LessThan, T_GreaterThan, T_Equal, T_NotEqual, T_And, T_Or,
 
     //brackets
-    T_LeftParenthesis, T_RightParentesis, T_LeftCurlyBracket, T_RightCurlyBracket,
+    T_LeftParenthesis, T_RightParenthesis, T_LeftCurlyBracket, T_RightCurlyBracket,
 
     //idk what to categorize these
     T_Comma, T_Semicolon, T_Assign,
@@ -76,7 +76,7 @@ namespace Tiny_Compiler
             Operators.Add("&&", Token_Class.T_And);
             Operators.Add("||", Token_Class.T_Or);
             Operators.Add("(", Token_Class.T_LeftParenthesis);
-            Operators.Add(")", Token_Class.T_RightParentesis);
+            Operators.Add(")", Token_Class.T_RightParenthesis);
             Operators.Add("{", Token_Class.T_LeftCurlyBracket);
             Operators.Add("}", Token_Class.T_RightCurlyBracket);
             Operators.Add(",", Token_Class.T_Comma);
@@ -163,10 +163,11 @@ namespace Tiny_Compiler
                     CurrentLexeme = CurrentChar.ToString();
                     FindTokenClass(CurrentLexeme);
                 }
-                else if (CurrentChar == '/' && (j+1) < SourceCode.Length && SourceCode[j+1] == '*')
+                //comments
+                else if (CurrentChar == '/' && (j + 1) < SourceCode.Length && SourceCode[j + 1] == '*')
                 {
                     j += 2;
-                    Errors.Error_List.Add($"Incomplete comment starting at {j-2}\n");
+                    Errors.Error_List.Add($"Incomplete comment starting at {j - 2}\n");
                     CurrentLexeme = "";
                     while (j < SourceCode.Length - 1 && !(SourceCode[j] == '*' && SourceCode[j + 1] == '/'))
                     {
@@ -184,7 +185,11 @@ namespace Tiny_Compiler
                 else if (CurrentChar == '<' || CurrentChar == '>' || CurrentChar == '=' || CurrentChar == '&' || CurrentChar == '|')
                 {
                     j++;
-                    while (j < SourceCode.Length && !(SourceCode[j] == ' ' || SourceCode[j] == '\n' || SourceCode[j] == '\t'))
+                    if (j < SourceCode.Length &&
+                    (
+                     (CurrentChar == '<' && SourceCode[j] == '>') ||
+                     (CurrentChar == '&' && SourceCode[j] == '&') ||
+                     (CurrentChar == '|' && SourceCode[j] == '|')))
                     {
                         CurrentLexeme += SourceCode[j];
                         j++;
@@ -192,11 +197,11 @@ namespace Tiny_Compiler
                     i = j - 1;
                     FindTokenClass(CurrentLexeme);
                 }
-
                 else if (CurrentChar == '+' || CurrentChar == '-' || CurrentChar == '*' || CurrentChar == '/' || CurrentChar == ':')
                 {
                     j++;
-                    while (j < SourceCode.Length && !(SourceCode[j] == ' ' || SourceCode[j] == '\n' || SourceCode[j] == '\t'))
+                    if (j < SourceCode.Length &&
+                    (CurrentChar == ':' && SourceCode[j] == '='))
                     {
                         CurrentLexeme += SourceCode[j];
                         j++;
@@ -212,7 +217,7 @@ namespace Tiny_Compiler
                 }
 
                 //stringliteral
-                 else if (CurrentChar == '"')
+                else if (CurrentChar == '"')
                 {
                     j++;
                     bool valid = false;
@@ -225,17 +230,22 @@ namespace Tiny_Compiler
                             j++;
                             valid = true;
                             Errors.Error_List.RemoveAt(Errors.Error_List.Count - 1);
-                            break; }
+                            break;
+                        }
                         else
                         {
                             CurrentLexeme += SourceCode[j];
-                            j++; }
+                            j++;
+                        }
                     }
                     if (valid)
-                    { i = j - 1;
+                    {
+                        i = j - 1;
                         FindTokenClass(CurrentLexeme);
-                    } }
-                else {
+                    }
+                }
+                else
+                {
                     FindTokenClass(CurrentLexeme);
                 }
 
