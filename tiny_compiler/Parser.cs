@@ -206,9 +206,72 @@ namespace Tiny_Compiler
         //}
 
         // Implement your logic here
+//Noha
+Node Condition()
+{
+    Node cond = new Node("Condition");
+    cond.Children.Add(match(Token_Class.T_Identifier));
+    cond.Children.Add(Condition_Operator());
+    cond.Children.Add(Term());
+    return cond;
+}
+Node Condition_Operator()
+{
+    Node op = new Node("Condition_Operator");
+    Token_Class tt = TokenStream[InputPointer].token_type;
+    if (tt == Token_Class.T_Equal)
+        op.Children.Add(match(Token_Class.T_Equal));
+    else if (tt == Token_Class.T_NotEqual)
+        op.Children.Add(match(Token_Class.T_NotEqual));
+    else if (tt == Token_Class.T_LessThan)
+        op.Children.Add(match(Token_Class.T_LessThan));
+    else if (tt == Token_Class.T_GreaterThan)
+        op.Children.Add(match(Token_Class.T_GreaterThan));
+    else
+    {
+        Errors.Error_List.Add("Parsing Error: Invalid condition operator.\n");
+        return null;
+    }
+    return op;
+}
+Node Else_If_Statement()
+{
+    Node elif = new Node("Else_If_Statement");
+    elif.Children.Add(match(Token_Class.T_ElseIf));
+    elif.Children.Add(Condition_Statement());
+    elif.Children.Add(match(Token_Class.T_Then));
+    elif.Children.Add(Statements());
+    elif.Children.Add(If_Ending());
+    return elif;
+}
+Node Else_Statement()
+{
+    Node els = new Node("Else_Statement");
+    els.Children.Add(match(Token_Class.T_Else));
+    els.Children.Add(Statements());
+    els.Children.Add(match(Token_Class.T_End));
 
-
-
+    return els;
+}
+Node Parameter()
+{
+    Node param = new Node("Parameter");
+    Token_Class tt = TokenStream[InputPointer].token_type;
+    if (tt == Token_Class.T_Int ||
+        tt == Token_Class.T_Float ||
+        tt == Token_Class.T_String)
+    {
+        param.Children.Add(match(tt));
+    }
+    else
+    {
+        Errors.Error_List.Add("Parsing Error: Expected datatype in parameter\n");
+        return null;
+    }
+    param.Children.Add(match(Token_Class.T_Identifier));
+    return param;
+}
+//---------------------------------------------
         public Node match(Token_Class ExpectedToken)
         {
 
