@@ -206,6 +206,146 @@ namespace Tiny_Compiler
         //}
 
         // Implement your logic here
+        
+bool isStatementStart()
+{
+    Token_Class tt = TokenStream[InputPointer].token_type;
+
+    return tt == Token_Class.T_Write
+        || tt == Token_Class.T_Read
+        || tt == Token_Class.T_Identifier
+        || tt == Token_Class.T_Return
+        || tt == Token_Class.T_Int
+        || tt == Token_Class.T_Float
+        || tt == Token_Class.T_String
+        || tt == Token_Class.T_If;
+}
+
+bool isBooleanOperator(Token_Class t)
+{
+    return t == Token_Class.T_And
+        || t == Token_Class.T_Or
+        || t == Token_Class.T_GreaterThan
+        || t == Token_Class.T_LessThan
+        || t == Token_Class.T_Equal
+        || t == Token_Class.T_NotEqual;
+}
+
+
+Node Statements()
+{
+    Node stmts = new Node("Statements");
+
+    Node first = Statement();
+    if (first == null) return null;
+
+    stmts.Children.Add(first);
+
+    while (isStatementStart())
+    {
+        stmts.Children.Add(Statement());
+    }
+
+    return stmts;
+}
+
+Node Statement()
+{
+    Token_Class tt = TokenStream[InputPointer].token_type;
+
+    if (tt == Token_Class.T_Write) return Write_Statement();
+    if (tt == Token_Class.T_Read) return Read_Statement();
+    if (tt == Token_Class.T_Return) return Return_Statement();
+    if (tt == Token_Class.T_If) return If_Statement();
+
+    if (tt == Token_Class.T_Identifier)
+    {
+       
+        if (InputPointer + 1 < TokenStream.Count &&
+            TokenStream[InputPointer + 1].token_type == Token_Class.T_LeftParenthesis)
+            return Function_Call();
+        else
+            return Assignment_Statement();
+    }
+
+    if (tt == Token_Class.T_Int || tt == Token_Class.T_Float || tt == Token_Class.T_String)
+        return Declaration_Statement();
+
+    Errors.Error_List.Add("Parsing Error: Invalid statement\n");
+    return null;
+}
+
+
+Node Read_Statement()
+{
+    Node readStmt = new Node("Read_Statement");
+    readStmt.Children.Add(match(Token_Class.T_Read));
+    readStmt.Children.Add(match(Token_Class.T_Identifier));
+    readStmt.Children.Add(match(Token_Class.T_Semicolon));
+    return readStmt;
+}
+
+Node Return_Statement()
+{
+    Node ret = new Node("Return_Statement");
+    ret.Children.Add(match(Token_Class.T_Return));
+    ret.Children.Add(Expression());
+    ret.Children.Add(match(Token_Class.T_Semicolon));
+    return ret;
+}
+
+
+Node If_Statement()
+{
+    Node ifStmt = new Node("If_Statement");
+
+    ifStmt.Children.Add(match(Token_Class.T_If));
+    ifStmt.Children.Add(Condition_Statement());
+    ifStmt.Children.Add(match(Token_Class.T_Then));
+    ifStmt.Children.Add(Statements());
+    ifStmt.Children.Add(If_Ending());
+
+    return ifStmt;
+}
+
+Node If_Ending()
+{
+    Node end = new Node("If_Ending");
+
+    Token_Class tt = TokenStream[InputPointer].token_type;
+
+    if (tt == Token_Class.T_ElseIf)
+        end.Children.Add(Else_If_Statement());
+    else if (tt == Token_Class.T_Else)
+        end.Children.Add(Else_Statement());
+    else
+        end.Children.Add(match(Token_Class.T_End)); // default END
+
+    return end;
+}
+
+
+Node Condition_Statement()
+{
+    Node cs = new Node("Condition_Statement");
+    cs.Children.Add(Condition());
+    cs.Children.Add(Condition_Ending());
+    return cs;
+}
+
+Node Condition_Ending()
+{
+    Node ce = new Node("Condition_Ending");
+
+    if (isBooleanOperator(TokenStream[InputPointer].token_type))
+    {
+        ce.Children.Add(Boolean_Operator());
+        ce.Children.Add(Condition());
+        return ce;
+    }
+
+    return null; 
+}
 //Noha
 Node Condition()
 {
