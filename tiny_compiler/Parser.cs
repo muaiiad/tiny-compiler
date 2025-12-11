@@ -257,6 +257,7 @@ Node Statement()
     if (tt == Token_Class.T_Read) return Read_Statement();
     if (tt == Token_Class.T_Return) return Return_Statement();
     if (tt == Token_Class.T_If) return If_Statement();
+    if (tt == Token_Class.T_Repeat) return Repeat_Statement(); 
 
     if (tt == Token_Class.T_Identifier)
     {
@@ -411,7 +412,84 @@ Node Parameter()
     param.Children.Add(match(Token_Class.T_Identifier));
     return param;
 }
-//---------------------------------------------
+
+Node FunctionName()
+{
+    //like idnetifer
+    return match(Token_Class.T_Identifier);
+}
+
+Node Function_Body()
+{
+    Node body = new Node("Function_Body");
+
+    //{
+    body.Children.Add(match(Token_Class.T_LeftCurlyBracket));
+    //statements
+    Node stmts = null;
+    if (isStatementStart()) 
+        stmts = Statements();
+    if (stmts != null) body.Children.Add(stmts);
+
+    //return
+    body.Children.Add(Return_Statement());
+
+    // }
+    body.Children.Add(match(Token_Class.T_RightCurlyBracket));
+
+    return body;
+}
+
+Node Write_Statement()
+{
+    Node write = new Node("Write_Statement");
+    //write
+    write.Children.Add(match(Token_Class.T_Write));
+
+    //expression aw endl
+    Token_Class next = TokenStream[InputPointer].token_type;
+    if (next == Token_Class.T_StringLiteral ||
+        next == Token_Class.T_Number ||
+        next == Token_Class.T_Identifier ||
+        next == Token_Class.T_LeftParenthesis)
+    {
+        write.Children.Add(Expression());
+    }
+    else if (next == Token_Class.T_Endl) 
+    {
+        write.Children.Add(match(Token_Class.T_Endl));
+    }
+    else
+    {
+        Errors.Error_List.Add("Parsing Error: Expected expression or endl after write\n");
+        return null;
+    }
+    //;
+    write.Children.Add(match(Token_Class.T_Semicolon));
+    return write;
+}
+
+Node Repeat_Statement()
+{
+    Node rep = new Node("Repeat_Statement");
+    //repeat
+    rep.Children.Add(match(Token_Class.T_Repeat));
+
+    // statements
+    Node stmts = null;
+    if (isStatementStart())
+        stmts = Statements();
+    
+    if (stmts != null) rep.Children.Add(stmts);
+
+    // until
+    rep.Children.Add(match(Token_Class.T_Until));
+    //condition
+    rep.Children.Add(Condition_Statement());
+
+    return rep;
+}
+        //---------------------------------------------
         public Node match(Token_Class ExpectedToken)
         {
 
