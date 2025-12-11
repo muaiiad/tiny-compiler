@@ -31,6 +31,74 @@ namespace Tiny_Compiler
             //root.Children.Add(Program());
             return root;
         }
+        //basmala
+        Node Program()
+        {
+            Node program = new Node("Program");
+            program.Children.Add(Function_statements());
+            program.Children.Add(Main_function());
+            return program;
+        }
+        Node Function_body()
+        {
+            Node body = new Node("Function_body");
+            body.Children.Add(match(Token_Class.T_LeftCurlyBracket));
+            body.Children.Add(Statements());
+            body.Children.Add(match(Token_Class.T_RightCurlyBracket));
+            return body;
+        }
+        Node Main_function()
+        {
+            Node main = new Node("Main_function");
+            main.Children.Add(Datatype());
+            main.Children.Add(match(Token_Class.T_Main));
+            main.Children.Add(match(Token_Class.T_LeftParenthesis));
+            main.Children.Add(match(Token_Class.T_RightParenthesis));
+            main.Children.Add(Function_body());
+            return main;
+        }
+        Node Datatype()
+        {
+            Node dt = new Node("Datatype");
+            Token_Class tt = TokenStream[InputPointer].token_type;
+            if (tt == Token_Class.T_Int ||
+                tt == Token_Class.T_Float ||
+                tt == Token_Class.T_String)
+            {
+                dt.Children.Add(match(tt));
+                return dt;
+            }
+            Errors.Error_List.Add("Parsing Error: Expected datatype.\n");
+            return null;
+        }
+        Node Function_Declaration()
+        {
+            Node decl = new Node("Function_Declaration");
+            decl.Children.Add(Datatype());
+            decl.Children.Add(match(Token_Class.T_Identifier));
+            decl.Children.Add(match(Token_Class.T_LeftParenthesis));
+            decl.Children.Add(Parameter());
+            decl.Children.Add(match(Token_Class.T_RightParenthesis));
+            return decl;
+        }
+        Node Function_statement()
+        {
+            Node func = new Node("Function_statement");
+            func.Children.Add(Function_Declaration());
+            func.Children.Add(Function_body());
+            return func;
+        }
+        Node Function_statements()
+        {
+            Node funcs = new Node("Function_statements");
+            if (TokenStream[InputPointer].token_type == Token_Class.T_Int || TokenStream[InputPointer].token_type == Token_Class.T_Float ||
+                TokenStream[InputPointer].token_type == Token_Class.T_String) {
+                funcs.Children.Add(Function_statement());
+                funcs.Children.Add(Function_statements());
+                return funcs;
+            }
+            return null; 
+        }
 
         Node Function_Call() {
             Node func = new Node("Function_Call");
