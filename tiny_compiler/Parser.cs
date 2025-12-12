@@ -71,16 +71,16 @@ namespace Tiny_Compiler
             Errors.Error_List.Add("Parsing Error: Expected datatype.\n");
             return null;
         }
-        Node Function_Declaration()
-        {
-            Node decl = new Node("Function_Declaration");
-            decl.Children.Add(Datatype());
-            decl.Children.Add(match(Token_Class.T_Identifier));
-            decl.Children.Add(match(Token_Class.T_LeftParenthesis));
-            decl.Children.Add(Parameter());
-            decl.Children.Add(match(Token_Class.T_RightParenthesis));
-            return decl;
-        }
+        //Node Function_Declaration()
+        //{
+        //    Node decl = new Node("Function_Declaration");
+        //    decl.Children.Add(Datatype());
+        //    decl.Children.Add(match(Token_Class.T_Identifier));
+        //    decl.Children.Add(match(Token_Class.T_LeftParenthesis));
+        //    decl.Children.Add(Parameter());
+        //    decl.Children.Add(match(Token_Class.T_RightParenthesis));
+        //    return decl;
+        //}
         Node Function_statement()
         {
             Node func = new Node("Function_statement");
@@ -557,6 +557,176 @@ Node Repeat_Statement()
 
     return rep;
 }
+        //---------------------------------------------
+        Node Assignment_Statement()
+        {
+            if (TokenStream[InputPointer].token_type == Token_Class.T_Identifier)
+            {
+                Node assignment = new Node("Assignment_Statement");
+                assignment.Children.Add(match(Token_Class.T_Identifier));
+                assignment.Children.Add(match(Token_Class.T_Assign));
+                assignment.Children.Add(Expression());
+                assignment.Children.Add(match(Token_Class.T_Semicolon));
+                return assignment;
+            }
+
+            Errors.Error_List.Add("Parsing Error: Expected " + Token_Class.T_Identifier.ToString() + "\r\n");
+            return null;
+        }
+
+        Node Initialiser_Statement()
+        {
+            if (TokenStream[InputPointer].token_type == Token_Class.T_Assign)
+            {
+                Node initStatement = new Node("Initialiser_Statement");
+                initStatement.Children.Add(match(Token_Class.T_Assign));
+                initStatement.Children.Add(Expression());
+                return initStatement;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        Node Initialiser()
+        {
+            if (TokenStream[InputPointer].token_type == Token_Class.T_Identifier)
+            {
+                Node init = new Node("Initialiser");
+                init.Children.Add(match(Token_Class.T_Identifier));
+                init.Children.Add(Initialiser_Statement());
+                return init;
+            }
+
+            Errors.Error_List.Add("Parsing Error: Expected " + Token_Class.T_Identifier.ToString() + "\r\n");
+            return null;
+        }
+
+        Node More_Initialisers()
+        {
+            if(TokenStream[InputPointer].token_type == Token_Class.T_Comma)
+            {
+                Node moreInits = new Node("More_Initialisers");
+                moreInits.Children.Add(match(Token_Class.T_Comma));
+                moreInits.Children.Add(Initialiser());
+                moreInits.Children.Add(More_Initialisers());
+                return moreInits;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        Node Initialiser_List()
+        {
+            Node initTemp = Initialiser();
+
+            if (initTemp != null)
+            {
+                Node initList = new Node("Initialiser_List");
+                initList.Children.Add(initTemp);
+                initList.Children.Add(More_Initialisers());
+                return initList;
+            }
+
+            Errors.Error_List.Add("Parsing Error: Expected an identifier" + "\r\n");
+            return null;
+        }
+
+        Node Declaration_statement()
+        {
+            Node datatype = Datatype();
+
+            if (datatype != null)
+            {
+                Node decl = new Node("Declaration_statement");
+                decl.Children.Add(datatype);
+
+                Node initList = Initialiser_List();
+                if (initList != null)
+                {
+                    decl.Children.Add(initList);
+                    decl.Children.Add(match(Token_Class.T_Semicolon));
+                    return decl;
+                }
+                else
+                {
+                    Errors.Error_List.Add("Parsing Error: Expected an identifier" + "\r\n");
+                    return null;
+                }
+            }
+            Errors.Error_List.Add("Parsing Error: Expected a datatype" + "\r\n");
+            return null;
+        }
+
+        Node More_Parameters()
+        {
+            if(TokenStream[InputPointer].token_type == Token_Class.T_Comma)
+            {
+                Node tempParam = Parameter();
+
+                if (tempParam != null)
+                {
+                    Node moreParams = new Node("More_Parameters");
+                    moreParams.Children.Add(match(Token_Class.T_Comma));
+                    moreParams.Children.Add(tempParam);
+                    moreParams.Children.Add(More_Parameters());
+                    return moreParams;
+                }
+                Errors.Error_List.Add("Parsing Error: Expected a parameter" + "\r\n");
+                return null;
+            }
+            return null;
+        }
+
+        Node Parameters()
+        {
+            Node tempParam = Parameter();
+
+            if (tempParam != null)
+            {
+                Node param = new Node("Parameters");
+                param.Children.Add(tempParam);
+                param.Children.Add(More_Parameters());
+                return param;
+            }
+            Errors.Error_List.Add("Parsing Error: Expected a parameter" + "\r\n");
+            return null;
+        }
+
+        Node Parameter_List()
+        {
+            Node tempParam = Parameters();
+
+            if (tempParam != null)
+            {
+                Node paramList = new Node("Parameter_List");
+                paramList.Children.Add(tempParam);
+                return paramList;
+            }
+            return null;
+        }
+
+        Node Function_Declaration()
+        {
+            Node dt = Datatype();
+
+            if (dt != null)
+            {
+                Node fDecl = new Node("Function_Declaration");
+                fDecl.Children.Add(dt);
+                fDecl.Children.Add(FunctionName());
+                fDecl.Children.Add(match(Token_Class.T_LeftParenthesis));
+                fDecl.Children.Add(Parameter_List());
+                fDecl.Children.Add(match(Token_Class.T_RightParenthesis));
+                fDecl.Children.Add(match(Token_Class.T_Semicolon));
+                return fDecl;
+            }
+            Errors.Error_List.Add("Parsing Error: Expected datatype.\n");
+            return null;
+        }
         //---------------------------------------------
         public Node match(Token_Class ExpectedToken)
         {
