@@ -289,15 +289,12 @@ bool isStatementStart()
         || tt == Token_Class.T_If;
 }
 
-bool isBooleanOperator(Token_Class t)
+/*bool isBooleanOperator(Token_Class t)
 {
     return t == Token_Class.T_And
-        || t == Token_Class.T_Or
-        || t == Token_Class.T_GreaterThan
-        || t == Token_Class.T_LessThan
-        || t == Token_Class.T_Equal
-        || t == Token_Class.T_NotEqual;
-}
+        || t == Token_Class.T_Or;
+     
+}*/
 
 
 Node Statements()
@@ -406,12 +403,18 @@ Node Condition_Ending()
 {
     Node ce = new Node("Condition_Ending");
 
-    if (isBooleanOperator(TokenStream[InputPointer].token_type))
+    if (TokenStream[InputPointer].token_type==Token_Class.T_And)
     {
-        ce.Children.Add(Boolean_Operator());
+        ce.Children.Add(match(Token_Class.T_And));
         ce.Children.Add(Condition());
-        return ce;
-    }
+        return ce;}
+        else if (TokenStream[InputPointer].token_type == Token_Class.T_Or)
+            {
+        ce.Children.Add(match(Token_Class.T_And));
+        ce.Children.Add(Condition());
+        return ce; 
+            }
+    
 
     return null; 
 }
