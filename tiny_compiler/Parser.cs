@@ -635,7 +635,7 @@ Node Repeat_Statement()
             return null;
         }
 
-        Node Declaration_statement()
+        Node Declaration_Statement()
         {
             Node datatype = Datatype();
 
