@@ -27,8 +27,20 @@ namespace Tiny_Compiler
         {
             this.InputPointer = 0;
             this.TokenStream = TokenStream;
-            //root = new Node("Program");
+            root = new Node("Program");
             //root.Children.Add(Program());
+            //Token_Class tt = TokenStream[InputPointer].token_type;
+            while ((TokenStream[InputPointer].token_type == Token_Class.T_Int ||
+                TokenStream[InputPointer].token_type == Token_Class.T_Float ||
+                TokenStream[InputPointer].token_type == Token_Class.T_String)
+                && InputPointer + 1 < TokenStream.Count
+                && TokenStream[InputPointer+1].token_type != Token_Class.T_Main)
+            {
+                root.Children.Add(Function_Declaration());
+            }
+            root.Children.Add(Main_function());
+
+
             return root;
         }
         //basmala
@@ -279,25 +291,26 @@ bool isStatementStart()
 {
     Token_Class tt = TokenStream[InputPointer].token_type;
 
-    return tt == Token_Class.T_Write
-        || tt == Token_Class.T_Read
-        || tt == Token_Class.T_Identifier
-        || tt == Token_Class.T_Return
-        || tt == Token_Class.T_Int
-        || tt == Token_Class.T_Float
-        || tt == Token_Class.T_String
-        || tt == Token_Class.T_If;
-}
+            return tt == Token_Class.T_Write
+                || tt == Token_Class.T_Read
+                || tt == Token_Class.T_Identifier
+                || tt == Token_Class.T_Return
+                || tt == Token_Class.T_Int
+                || tt == Token_Class.T_Float
+                || tt == Token_Class.T_String
+                || tt == Token_Class.T_If
+                || tt == Token_Class.T_Repeat;
+        }
 
-/*bool isBooleanOperator(Token_Class t)
-{
-    return t == Token_Class.T_And
-        || t == Token_Class.T_Or;
-     
-}*/
+        /*bool isBooleanOperator(Token_Class t)
+        {
+            return t == Token_Class.T_And
+                || t == Token_Class.T_Or;
+
+        }*/
 
 
-Node Statements()
+        Node Statements()
 {
     Node stmts = new Node("Statements");
 
@@ -545,14 +558,7 @@ Node Repeat_Statement()
     Node rep = new Node("Repeat_Statement");
     //repeat
     rep.Children.Add(match(Token_Class.T_Repeat));
-
-    // statements
-    Node stmts = null;
-    if (isStatementStart())
-        stmts = Statements();
-    
-    if (stmts != null) rep.Children.Add(stmts);
-
+    rep.Children.Add(Statements());
     // until
     rep.Children.Add(match(Token_Class.T_Until));
     //condition
