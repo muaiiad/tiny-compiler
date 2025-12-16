@@ -381,6 +381,7 @@ namespace Tiny_Compiler
             if (first == null) return null;
 
             stmts.Children.Add(first);
+               stmts.Children.Add(Statements2());
 
             while (isStatementStart())
             {
@@ -389,6 +390,26 @@ namespace Tiny_Compiler
 
             return stmts;
         }
+     Node Statements2()
+{
+    Node stmts2= new Node("Statements'");
+
+    if (isStatementStart())
+    {
+        Node stmts = Statements();
+        if (stmts != null)
+        {
+            stmts2.Children.Add(stmts);
+            stmts2.Children.Add(Statements2());
+            return stmts2;
+        }
+    }
+
+    // ε
+    stmts2.Children.Add(new Node("ε"));
+    return stmts2;
+}
+
 
         Node Statement()
         {
