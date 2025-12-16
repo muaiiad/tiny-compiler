@@ -22,7 +22,7 @@ int main()
 }
 
 
----
+--- TEST 2:
 
 /* Sample program includes all 30 rules */
 
@@ -61,7 +61,7 @@ int main()
     /* complicated equation */
     float z1 := 3 * 2 * (2 + 1) / 2 - 5.3;
 
-    z1 := z1 + sum(1, y);
+    z1 := z1 + sum(z, y);
 
     if z1 > 5 || z1 < counter && z1 = 1 then
         write z1;
