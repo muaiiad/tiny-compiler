@@ -47,13 +47,14 @@ namespace Tiny_Compiler
             if (InputPointer < TokenStream.Count)
             {
                 root.Children.Add(Main_function());
-            } else
+            }
+            else
             {
                 Errors.Error_List.Add("No main functions \r\n");
             }
 
 
-                return root;
+            return root;
         }
         //basmala
         Node Program()
@@ -357,7 +358,7 @@ namespace Tiny_Compiler
             return tt == Token_Class.T_Write
                 || tt == Token_Class.T_Read
                 || tt == Token_Class.T_Identifier
-                || tt == Token_Class.T_Return
+                //|| tt == Token_Class.T_Return
                 || tt == Token_Class.T_Int
                 || tt == Token_Class.T_Float
                 || tt == Token_Class.T_String
@@ -381,34 +382,34 @@ namespace Tiny_Compiler
             if (first == null) return null;
 
             stmts.Children.Add(first);
-               stmts.Children.Add(Statements2());
+            stmts.Children.Add(Statements2());
 
-            while (isStatementStart())
-            {
-                stmts.Children.Add(Statement());
-            }
+            //while (isStatementStart())
+            //{
+            //    stmts.Children.Add(Statement());
+            //}
 
             return stmts;
         }
-     Node Statements2()
-{
-    Node stmts2= new Node("Statements'");
-
-    if (isStatementStart())
-    {
-        Node stmts = Statements();
-        if (stmts != null)
+        Node Statements2()
         {
-            stmts2.Children.Add(stmts);
-            stmts2.Children.Add(Statements2());
+            Node stmts2 = new Node("Statements'");
+
+            if (isStatementStart())
+            {
+                Node stmts = Statement();
+                if (stmts != null)
+                {
+                    stmts2.Children.Add(stmts);
+                    stmts2.Children.Add(Statements2());
+                    return stmts2;
+                }
+            }
+
+            // ε
+            //stmts2.Children.Add(new Node("ε"));
             return stmts2;
         }
-    }
-
-    // ε
-    stmts2.Children.Add(new Node("ε"));
-    return stmts2;
-}
 
 
         Node Statement()
