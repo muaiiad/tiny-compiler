@@ -63,14 +63,6 @@ namespace Tiny_Compiler
             program.Children.Add(Main_function());
             return program;
         }
-        Node Function_body()
-        {
-            Node body = new Node("Function_body");
-            body.Children.Add(match(Token_Class.T_LeftCurlyBracket));
-            body.Children.Add(Statements());
-            body.Children.Add(match(Token_Class.T_RightCurlyBracket));
-            return body;
-        }
         Node Main_function()
         {
             Node main = new Node("Main_function");
@@ -78,7 +70,7 @@ namespace Tiny_Compiler
             main.Children.Add(match(Token_Class.T_Main));
             main.Children.Add(match(Token_Class.T_LeftParenthesis));
             main.Children.Add(match(Token_Class.T_RightParenthesis));
-            main.Children.Add(Function_body());
+            main.Children.Add(Function_Body());
             return main;
         }
         Node Datatype()
@@ -114,7 +106,7 @@ namespace Tiny_Compiler
         {
             Node func = new Node("Function_statement");
             func.Children.Add(Function_Declaration());
-            func.Children.Add(Function_body());
+            func.Children.Add(Function_Body());
             return func;
         }
         Node Function_statements()
