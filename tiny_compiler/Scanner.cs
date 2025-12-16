@@ -167,7 +167,7 @@ namespace Tiny_Compiler
                 else if (CurrentChar == '/' && (j + 1) < SourceCode.Length && SourceCode[j + 1] == '*')
                 {
                     j += 2;
-                    Errors.Error_List.Add($"Incomplete comment starting at {j - 2}\n");
+                    Errors.Error_List.Add($"Incomplete comment starting at {j - 2}\r\n");
                     CurrentLexeme = "";
                     while (j < SourceCode.Length - 1 && !(SourceCode[j] == '*' && SourceCode[j + 1] == '/'))
                     {
@@ -221,7 +221,7 @@ namespace Tiny_Compiler
                 {
                     j++;
                     bool valid = false;
-                    Errors.Error_List.Add($"Error: Unterminated String Literal starting at {i}\n");
+                    Errors.Error_List.Add($"Error: Unterminated String Literal starting at {i}\r\n");
                     while (j < SourceCode.Length)
                     {
                         if (SourceCode[j] == '"')
@@ -299,7 +299,7 @@ namespace Tiny_Compiler
 
                 //Is it an undefined?
 
-                Errors.Error_List.Add("Error: Undefined Token -> " + Lex + "\n");
+                Errors.Error_List.Add("Error: Undefined Token -> " + Lex + "\r\n");
 
                 return;
             }

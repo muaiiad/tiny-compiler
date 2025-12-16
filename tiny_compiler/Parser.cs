@@ -34,10 +34,9 @@ namespace Tiny_Compiler
             // this while loop goes on as long as the input pointer points to a data type
             // and the next will point to T_Identifier if it is a function declaration
             // and T_Main if it's main declaration
-            while ((TokenStream[InputPointer].token_type == Token_Class.T_Int ||
+            while (InputPointer + 1 < TokenStream.Count && (TokenStream[InputPointer].token_type == Token_Class.T_Int ||
                 TokenStream[InputPointer].token_type == Token_Class.T_Float ||
                 TokenStream[InputPointer].token_type == Token_Class.T_String)
-                && InputPointer + 1 < TokenStream.Count
                 && TokenStream[InputPointer + 1].token_type != Token_Class.T_Main)
             {
                 root.Children.Add(Function_statement());
@@ -45,10 +44,16 @@ namespace Tiny_Compiler
                 // or main, but we don't
                 // the input pointer never progresses past the last parameter of the first function declaration
             }
-            root.Children.Add(Main_function());
+            if (InputPointer < TokenStream.Count)
+            {
+                root.Children.Add(Main_function());
+            } else
+            {
+                Errors.Error_List.Add("No main functions \r\n");
+            }
 
 
-            return root;
+                return root;
         }
         //basmala
         Node Program()
@@ -79,6 +84,11 @@ namespace Tiny_Compiler
         Node Datatype()
         {
             Node dt = new Node("Datatype");
+            if (InputPointer >= TokenStream.Count)
+            {
+                Errors.Error_List.Add("Parsing Error: Expected operand\r\n");
+                return null;
+            }
             Token_Class tt = TokenStream[InputPointer].token_type;
             if (tt == Token_Class.T_Int ||
                 tt == Token_Class.T_Float ||
@@ -110,6 +120,11 @@ namespace Tiny_Compiler
         Node Function_statements()
         {
             Node funcs = new Node("Function_statements");
+            if (InputPointer >= TokenStream.Count)
+            {
+                Errors.Error_List.Add("Parsing Error: Expected function statements\r\n");
+                return null;
+            }
             if (TokenStream[InputPointer].token_type == Token_Class.T_Int || TokenStream[InputPointer].token_type == Token_Class.T_Float ||
                 TokenStream[InputPointer].token_type == Token_Class.T_String)
             {
@@ -132,6 +147,11 @@ namespace Tiny_Compiler
 
         Node Arguments()
         {
+            if (InputPointer >= TokenStream.Count)
+            {
+                Errors.Error_List.Add("Parsing Error: Expected arguments\r\n");
+                return null;
+            }
             if (TokenStream[InputPointer].token_type == Token_Class.T_Identifier)
             {
                 Node args = new Node("Arguments");
@@ -148,6 +168,11 @@ namespace Tiny_Compiler
         }
         Node MoreArgs()
         {
+            if (InputPointer >= TokenStream.Count)
+            {
+                Errors.Error_List.Add("Parsing Error: Expected more arguments\r\n");
+                return null;
+            }
             if (TokenStream[InputPointer].token_type == Token_Class.T_Comma)
             {
                 Node moreargs = new Node("MoreArgs");
@@ -166,6 +191,11 @@ namespace Tiny_Compiler
         Node Term()
         {
             Node term = new Node("Term");
+            if (InputPointer >= TokenStream.Count)
+            {
+                Errors.Error_List.Add("Parsing Error: Expected term\r\n");
+                return null;
+            }
             if (TokenStream[InputPointer].token_type == Token_Class.T_Identifier)
             {
                 if (InputPointer + 1 < TokenStream.Count &&
@@ -194,6 +224,11 @@ namespace Tiny_Compiler
         Node Operand()
         {
             Node operand = new Node("Operand");
+            if (InputPointer >= TokenStream.Count)
+            {
+                Errors.Error_List.Add("Parsing Error: Expected operand\r\n");
+                return null;
+            }
             if (TokenStream[InputPointer].token_type == Token_Class.T_LeftParenthesis)
             {
                 match(Token_Class.T_LeftParenthesis);
@@ -217,6 +252,11 @@ namespace Tiny_Compiler
         Node Operation()
         {
             Node operation = new Node("Operation");
+            if (InputPointer >= TokenStream.Count)
+            {
+                Errors.Error_List.Add("Parsing Error: Expected operation\r\n");
+                return null;
+            }
             if (TokenStream[InputPointer].token_type == Token_Class.T_PlusOp)
             {
                 operation.Children.Add(match(Token_Class.T_PlusOp));
@@ -235,7 +275,7 @@ namespace Tiny_Compiler
             }
             else
             {
-                Errors.Error_List.Add("Parsing Error: Expected operation\n");
+                Errors.Error_List.Add("Parsing Error: Expected operation\r\n");
                 return null;
             }
             return operation;
@@ -243,6 +283,11 @@ namespace Tiny_Compiler
         Node EquationPrime()
         {
             Node equationprime = new Node("EquationPrime");
+            if (InputPointer >= TokenStream.Count)
+            {
+                Errors.Error_List.Add("Parsing Error: Expected operation\r\n");
+                return null;
+            }
             if (TokenStream[InputPointer].token_type == Token_Class.T_PlusOp ||
             TokenStream[InputPointer].token_type == Token_Class.T_MinusOp ||
             TokenStream[InputPointer].token_type == Token_Class.T_MultiplyOp ||
@@ -261,6 +306,11 @@ namespace Tiny_Compiler
         Node Expression()
         {
             Node expression = new Node("Expression");
+            if (InputPointer >= TokenStream.Count)
+            {
+                Errors.Error_List.Add("Parsing Error: Expected expression\r\n");
+                return null;
+            }
             if (TokenStream[InputPointer].token_type == Token_Class.T_StringLiteral)
             {
                 expression.Children.Add(match(Token_Class.T_StringLiteral));
@@ -305,6 +355,11 @@ namespace Tiny_Compiler
 
         bool isStatementStart()
         {
+            if (InputPointer >= TokenStream.Count)
+            {
+                Errors.Error_List.Add("Parsing Error: Expected keyword\r\n");
+                return false;
+            }
             Token_Class tt = TokenStream[InputPointer].token_type;
 
             return tt == Token_Class.T_Write
@@ -345,6 +400,11 @@ namespace Tiny_Compiler
 
         Node Statement()
         {
+            if (InputPointer >= TokenStream.Count)
+            {
+                Errors.Error_List.Add("Parsing Error: Expected statement\r\n");
+                return null;
+            }
             Token_Class tt = TokenStream[InputPointer].token_type;
 
             if (tt == Token_Class.T_Write) return Write_Statement();
@@ -366,7 +426,7 @@ namespace Tiny_Compiler
             if (tt == Token_Class.T_Int || tt == Token_Class.T_Float || tt == Token_Class.T_String)
                 return Declaration_Statement();
 
-            Errors.Error_List.Add("Parsing Error: Invalid statement\n");
+            Errors.Error_List.Add("Parsing Error: Invalid statement\r\n");
             return null;
         }
 
@@ -406,6 +466,11 @@ namespace Tiny_Compiler
         Node If_Ending()
         {
             Node end = new Node("If_Ending");
+            if (InputPointer >= TokenStream.Count)
+            {
+                Errors.Error_List.Add("Parsing Error: trailing if\r\n");
+                return null;
+            }
 
             Token_Class tt = TokenStream[InputPointer].token_type;
 
@@ -431,6 +496,11 @@ namespace Tiny_Compiler
         Node Boolean_Operator()
         {
             Node bo = new Node("Boolean_Operator");
+            if (InputPointer >= TokenStream.Count)
+            {
+                Errors.Error_List.Add("Parsing Error: Expected Boolean Operator\r\n");
+                return null;
+            }
             Token_Class tt = TokenStream[InputPointer].token_type;
             if (tt == Token_Class.T_And)
                 bo.Children.Add(match(Token_Class.T_And));
@@ -438,7 +508,7 @@ namespace Tiny_Compiler
                 bo.Children.Add(match(Token_Class.T_Or));
             else
             {
-                Errors.Error_List.Add("Parsing Error: Invalid boolean operator.\n");
+                Errors.Error_List.Add("Parsing Error: Invalid boolean operator\r\n");
                 return null;
             }
             return bo;
@@ -447,7 +517,11 @@ namespace Tiny_Compiler
         Node Condition_Ending()
         {
             Node ce = new Node("Condition_Ending");
-
+            if (InputPointer >= TokenStream.Count)
+            {
+                Errors.Error_List.Add("Parsing Error: Expected Condition Ending\r\n");
+                return null;
+            }
             if (TokenStream[InputPointer].token_type == Token_Class.T_And ||
                 TokenStream[InputPointer].token_type == Token_Class.T_Or)
             {
@@ -471,6 +545,11 @@ namespace Tiny_Compiler
         Node Condition_Operator()
         {
             Node op = new Node("Condition_Operator");
+            if (InputPointer >= TokenStream.Count)
+            {
+                Errors.Error_List.Add("Parsing Error: Expected conditional operator\r\n");
+                return null;
+            }
             Token_Class tt = TokenStream[InputPointer].token_type;
             if (tt == Token_Class.T_Equal)
                 op.Children.Add(match(Token_Class.T_Equal));
@@ -482,7 +561,7 @@ namespace Tiny_Compiler
                 op.Children.Add(match(Token_Class.T_GreaterThan));
             else
             {
-                Errors.Error_List.Add("Parsing Error: Invalid condition operator.\n");
+                Errors.Error_List.Add("Parsing Error: Invalid condition operator.\r\n");
                 return null;
             }
             return op;
@@ -509,6 +588,11 @@ namespace Tiny_Compiler
         Node Parameter()
         {
             Node param = new Node("Parameter");
+            if (InputPointer >= TokenStream.Count)
+            {
+                Errors.Error_List.Add("Parsing Error: Expected Parameter\r\n");
+                return null;
+            }
             Token_Class tt = TokenStream[InputPointer].token_type;
             if (tt == Token_Class.T_Int ||
                 tt == Token_Class.T_Float ||
@@ -518,7 +602,7 @@ namespace Tiny_Compiler
             }
             else
             {
-                Errors.Error_List.Add("Parsing Error: Expected datatype in parameter\n");
+                Errors.Error_List.Add("Parsing Error: Expected datatype in parameter\r\n");
                 return null;
             }
             param.Children.Add(match(Token_Class.T_Identifier));
@@ -559,6 +643,11 @@ namespace Tiny_Compiler
             write.Children.Add(match(Token_Class.T_Write));
 
             //expression aw endl
+            if (InputPointer >= TokenStream.Count)
+            {
+                Errors.Error_List.Add("Parsing Error: Expected write statement\r\n");
+                return null;
+            }
             Token_Class next = TokenStream[InputPointer].token_type;
             if (next == Token_Class.T_StringLiteral ||
                 next == Token_Class.T_Number ||
@@ -573,7 +662,7 @@ namespace Tiny_Compiler
             }
             else
             {
-                Errors.Error_List.Add("Parsing Error: Expected expression or endl after write\n");
+                Errors.Error_List.Add("Parsing Error: Expected expression or endl after write\r\n");
                 return null;
             }
             //;
@@ -597,6 +686,11 @@ namespace Tiny_Compiler
         //---------------------------------------------
         Node Assignment_Statement()
         {
+            if (InputPointer >= TokenStream.Count)
+            {
+                Errors.Error_List.Add("Parsing Error: Expected identifier\r\n");
+                return null;
+            }
             if (TokenStream[InputPointer].token_type == Token_Class.T_Identifier)
             {
                 Node assignment = new Node("Assignment_Statement");
@@ -613,6 +707,11 @@ namespace Tiny_Compiler
 
         Node Initialiser_Statement()
         {
+            if (InputPointer >= TokenStream.Count)
+            {
+                Errors.Error_List.Add("Parsing Error: Expected assignment operator\r\n");
+                return null;
+            }
             if (TokenStream[InputPointer].token_type == Token_Class.T_Assign)
             {
                 Node initStatement = new Node("Initialiser_Statement");
@@ -628,6 +727,11 @@ namespace Tiny_Compiler
 
         Node Initialiser()
         {
+            if (InputPointer >= TokenStream.Count)
+            {
+                Errors.Error_List.Add("Parsing Error: Expected identifier\r\n");
+                return null;
+            }
             if (TokenStream[InputPointer].token_type == Token_Class.T_Identifier)
             {
                 Node init = new Node("Initialiser");
@@ -700,6 +804,11 @@ namespace Tiny_Compiler
 
         Node More_Parameters()
         {
+            if (InputPointer >= TokenStream.Count)
+            {
+                Errors.Error_List.Add("Parsing Error: Expected more parameters\r\n");
+                return null;
+            }
             if (TokenStream[InputPointer].token_type == Token_Class.T_Comma)
             {
                 Node moreParams = new Node("More_Parameters");
@@ -778,9 +887,9 @@ namespace Tiny_Compiler
                 else
                 {
                     Errors.Error_List.Add("Parsing Error: Expected "
-                        + ExpectedToken.ToString() + " and " +
+                        + ExpectedToken.ToString() + " but found " +
                         TokenStream[InputPointer].token_type.ToString() +
-                        "  found\r\n");
+                        " at Token " + InputPointer + "\r\n");
                     InputPointer++;
                     return null;
                 }
